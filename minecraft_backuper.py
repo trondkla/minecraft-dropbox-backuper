@@ -48,7 +48,8 @@ def main():
 	# Update todays backup
 	uploader.upload(file_path, force=True, overwrite=True)
 
-	
+	# Detele zip after uploaded
+	os.remove(file_path)
 
 	# Delete old backup
 	delete_date = current_date - timedelta(days=days_to_backup)
