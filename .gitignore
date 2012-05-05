@@ -1,4 +1,6 @@
 *.py[co]
+upload.py
+*.txt
 
 # Packages
 *.egg
