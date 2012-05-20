@@ -22,7 +22,7 @@ ACCESS_TYPE = 'app_folder'  # should be 'dropbox' or 'app_folder' as configured 
 
 def get_file_name(file_path, file_number):
 	if(file_number > 0):
-		return file_path[0:len(file_path)-4]+"."+str(len(files_to_be_uploaded))+".zip"
+		return file_path[0:len(file_path)-4]+"."+str(len(file_number))+".zip"
 	else:
 		return file_path[0:len(file_path)-4]+".zip"
 
