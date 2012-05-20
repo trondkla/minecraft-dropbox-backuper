@@ -20,9 +20,17 @@ if len(lines) == 2:
 
 ACCESS_TYPE = 'app_folder'  # should be 'dropbox' or 'app_folder' as configured for your app
 
+def get_file_name(file_path, file_number):
+	if(file_number > 0):
+		return file_path[0:len(file_path)-4]+"."+str(len(files_to_be_uploaded))+".zip"
+	else:
+		return file_path[0:len(file_path)-4]+".zip"
+
+
+
 def main():
 
-	days_to_backup = 1
+	days_to_backup = 3
 
 
 	if len(sys.argv) == 1:
@@ -42,20 +50,52 @@ def main():
 	current_date = date.today()
 	file_path = "%s.zip" % current_date
 
-	#Zip folder into yyyy-mm-dd.zip
-	makeArchive(dirEntries(world_directory, True), file_path)
+	#Zip folder into yyyy-mm-dd-#.zip
+
+	size_of_files = 0
+	files_to_zip = []
+	archive_nr = 0
+	files_to_be_uploaded = []
+
+	files = dirEntries(world_directory, True)
+	for file in files:
+		# dropbox has a 150 MB max-size on files
+		if os.path.getsize(file) + size_of_files > 150000000:
+			file_arch = get_file_name(file_path, len(files_to_be_uploaded))
+			makeArchive(files_to_zip, file_arch)
+			files_to_be_uploaded.append(file_arch)
+			
+			files_to_zip = []
+			size_of_files = 0
+
+
+		files_to_zip.append(file)
+		size_of_files += os.path.getsize(file)
+		
+		
+	#archive remaining files
+	file_arch = get_file_name(file_path, len(files_to_be_uploaded))
+	makeArchive(files_to_zip, file_arch)
+	files_to_be_uploaded.append(file_arch)
 
 	# Update todays backup
-	uploader.upload(file_path, force=True, overwrite=True)
+	for file in files_to_be_uploaded:
+		uploader.upload(file, force=True, overwrite=True)
+		
+		#delete local zip
+		os.remove(file)
 
-	# Detele zip after uploaded
-	os.remove(file_path)
 
 	# Delete old backup
 	delete_date = current_date - timedelta(days=days_to_backup)
-	file_path = "%s.zip" % delete_date
-	print "Deleting old file: %s" % file_path
-	uploader.delete(file_path)
+	file_date = "%s" % delete_date
+	print "Deleting old files with date: %s" % file_date
+
+	files = uploader.search("", file_date)
+
+	for file in files:
+		uploader.delete(file['path'])
+	
 
 ### From http://bytes.com/topic/python/answers/851018-how-zip-directory-python-using-zipfile 
 def makeArchive(fileList, archive):
