@@ -5,7 +5,7 @@
 
 
 import sys
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 import zipfile, os
 
 # Requirements:
@@ -47,8 +47,8 @@ def main():
 	uploader = Uploader(APP_KEY, APP_SECRET)
 	
 
-	current_date = date.today()
-	file_path = "%s.zip" % current_date
+	current_date = datetime.now()
+	file_path = "%s.zip" % current_date.strftime("%Y-%m-%d %H-%M-%S")
 
 	#Zip folder into yyyy-mm-dd-#.zip
 
@@ -59,7 +59,7 @@ def main():
 
 	files = dirEntries(world_directory, True)
 	for file in files:
-		# dropbox has a 150 MB max-size on files
+		# dropbox has a 150 MB max-size on files (making each file around 95 MB)
 		if os.path.getsize(file) + size_of_files > 150000000:
 			file_arch = get_file_name(file_path, len(files_to_be_uploaded))
 			makeArchive(files_to_zip, file_arch)
