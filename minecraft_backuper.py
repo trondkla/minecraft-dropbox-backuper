@@ -46,12 +46,11 @@ def main():
 	# Uploader from upload.py script
 	uploader = Uploader(APP_KEY, APP_SECRET)
 	
-
 	current_date = datetime.now()
 	file_path = "%s.zip" % current_date.strftime("%Y-%m-%d %H-%M-%S")
 
 	#Zip folder into yyyy-mm-dd-#.zip
-
+	
 	size_of_files = 0
 	files_to_zip = []
 	archive_nr = 0
@@ -84,11 +83,10 @@ def main():
 		
 		#delete local zip
 		os.remove(file)
-
-
+		
 	# Delete old backup
 	delete_date = current_date - timedelta(days=days_to_backup)
-	file_date = "%s" % delete_date
+	file_date = "%s" % delete_date.strftime("%Y-%m-%d")
 	print "Deleting old files with date: %s" % file_date
 
 	files = uploader.search("", file_date)
